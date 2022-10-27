@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.izhouy.template.mapper.LogErrorInfoMapper">
+
+    <resultMap type="com.izhouy.template.domain.LogErrorInfo" id="LogErrorInfoMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="reqParam" column="req_param" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="message" column="message" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="method" column="method" jdbcType="VARCHAR"/>
+        <result property="uri" column="uri" jdbcType="VARCHAR"/>
+        <result property="ip" column="ip" jdbcType="VARCHAR"/>
+        <result property="version" column="version" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into my_subcontract_template.log_error_info(req_param, name, message, user_id, user_name, method, uri,
+        ip, version, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.reqParam}, #{entity.name}, #{entity.message}, #{entity.userId}, #{entity.userName},
+            #{entity.method}, #{entity.uri}, #{entity.ip}, #{entity.version}, #{entity.createTime})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into my_subcontract_template.log_error_info(req_param, name, message, user_id, user_name, method, uri,
+        ip, version, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.reqParam}, #{entity.name}, #{entity.message}, #{entity.userId}, #{entity.userName},
+            #{entity.method}, #{entity.uri}, #{entity.ip}, #{entity.version}, #{entity.createTime})
+        </foreach>
+        on duplicate key update
+        req_param = values(req_param) , name = values(name) , message = values(message) , user_id = values(user_id) ,
+        user_name = values(user_name) , method = values(method) , uri = values(uri) , ip = values(ip) , version =
+        values(version) , create_time = values(create_time)
+    </insert>
+
+</mapper>
+

@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    active: local
+server:
+  port: 8080
+swagger:
+  base-package: com.izhouy.template
+  title: ${spring.application.name}
+  author-name: jtlsp
+logback:
+  path: ./usr/verticles/logs
+  service-name: ${spring.application.name}
+logging:
+  config: classpath:logback/logback-spring.xml
