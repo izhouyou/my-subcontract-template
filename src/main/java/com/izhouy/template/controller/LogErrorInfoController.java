@@ -60,7 +60,7 @@ public class LogErrorInfoController {
      */
     @GetMapping("{id}")
     @ApiOperation("操作日志异常信息根据主键id查询接口")
-    @ApiImplicitParam(name = "id", value = "主键id", defaultValue = "1", required = true)
+    @ApiImplicitParam(name = "id", value = "主键id", defaultValue = "1", required = true, dataTypeClass = Long.class)
     public Result<LogErrorInfo> selectOne(@NotNull(message = "id不能为空") @PathVariable Long id) {
         return ResultGeneratorUtils.success(this.logErrorInfoService.getById(id));
     }
@@ -99,7 +99,7 @@ public class LogErrorInfoController {
      */
     @DeleteMapping
     @ApiOperation("操作日志异常信息批量删除接口")
-    @ApiImplicitParam(name = "idList", value = "主键id集合", defaultValue = "1,2", required = true)
+    @ApiImplicitParam(name = "idList", value = "主键id集合", defaultValue = "1,2", required = true, dataTypeClass = List.class)
     @Log(modul = "LogErrorInfo", type = LogAnnotConstants.DELETE, desc = "操作日志异常信息删除接口")
     public Result<Boolean> delete(@RequestParam("idList") List<Long> idList) {
         return ResultGeneratorUtils.success(this.logErrorInfoService.removeByIds(idList));
