@@ -8,7 +8,7 @@ swagger:
   title: ${spring.application.name}
   author-name: jtlsp
 logback:
-  path: ./usr/verticles/logs
+  path: .logs
   service-name: ${spring.application.name}
 logging:
   config: classpath:logback/logback-spring.xml
