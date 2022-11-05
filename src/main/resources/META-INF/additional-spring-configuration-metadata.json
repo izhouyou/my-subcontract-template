@@ -1,0 +1,48 @@
+{
+  "properties": [
+    {
+      "name": "swagger.title",
+      "type": "java.lang.String",
+      "description": "swagger标题"
+    },
+    {
+      "name": "swagger.author-name",
+      "type": "java.lang.String",
+      "description": "swagger作者"
+    },
+    {
+      "name": "swagger.author-email",
+      "type": "java.lang.String",
+      "description": "swagger邮箱"
+    },
+    {
+      "name": "swagger.author-url",
+      "type": "java.lang.String",
+      "description": "swagger路径"
+    },
+    {
+      "name": "swagger.terms-of-service-url",
+      "type": "java.lang.String",
+      "description": "swagger项目路径"
+    },
+    {
+      "name": "swagger.version",
+      "type": "java.lang.String",
+      "description": "swagger版本"
+    },
+    {
+      "name": "swagger.base-package",
+      "type": "java.lang.String",
+      "description": "swagger扫描的路径"
+    },
+    {
+      "name": "snowflake.machine-id",
+      "type": "java.lang.Long",
+      "description": "工作ID (0~31)"
+    },
+    {
+      "name": "snowflake.data-center-id",
+      "type": "java.lang.Long",
+      "description": "数据中心ID (0~31)"
+    }
+  ] }
