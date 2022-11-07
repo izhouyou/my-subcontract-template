@@ -1,4 +1,4 @@
-package com.izhouy.template.common.annotation;
+package com.izhouy.template.common.anno;
 
 import java.lang.annotation.*;
 
@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Log {
+public @interface ControllerLogAnno {
 
     /**
      * 操作模块

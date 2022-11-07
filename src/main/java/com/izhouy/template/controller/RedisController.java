@@ -1,6 +1,6 @@
 package com.izhouy.template.controller;
 
-import com.izhouy.template.common.annotation.Log;
+import com.izhouy.template.common.anno.ControllerLogAnno;
 import com.izhouy.template.common.constant.LogAnnotConstants;
 import com.izhouy.template.util.RedisUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +24,7 @@ public class RedisController {
     private RedisUtils redisUtils;
 
     @GetMapping("setValue")
-    @Log(modul = "redis", type = LogAnnotConstants.INSERT, desc = "新增redis缓存")
+    @ControllerLogAnno(modul = "redis", type = LogAnnotConstants.INSERT, desc = "新增redis缓存")
     public String setValue(@RequestParam("key") String key, @RequestParam("value") String value){
         redisUtils.setStr(key, value);
         return "success";

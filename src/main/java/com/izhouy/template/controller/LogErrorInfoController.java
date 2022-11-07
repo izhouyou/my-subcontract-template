@@ -1,6 +1,6 @@
 package com.izhouy.template.controller;
 
-import com.izhouy.template.common.annotation.Log;
+import com.izhouy.template.common.anno.Log;
 import com.izhouy.template.common.constant.LogAnnotConstants;
 import info.jiatu.jtlsp.common.annotation.AddGroups;
 import info.jiatu.jtlsp.common.annotation.UpdGroups;

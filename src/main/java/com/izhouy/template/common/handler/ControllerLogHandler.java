@@ -1,6 +1,8 @@
-package com.izhouy.template.common.aop;
+package com.izhouy.template.common.handler;
 
-import com.izhouy.template.common.annotation.Log;
+import com.izhouy.template.common.anno.ControllerLogAnno;
+import com.izhouy.template.common.anno.InvokeRecordAnno;
+import com.izhouy.template.common.anno.Log;
 import com.izhouy.template.common.constant.LogAnnotConstants;
 import com.izhouy.template.domain.LogErrorInfo;
 import com.izhouy.template.domain.LogInfo;
@@ -8,10 +10,10 @@ import com.izhouy.template.service.LogErrorInfoService;
 import com.izhouy.template.service.LogInfoService;
 import com.izhouy.template.util.IpUtils;
 import info.jiatu.jtlsp.common.response.Result;
-import info.jiatu.jtlsp.common.util.ConvertUtils;
 import info.jiatu.jtlsp.common.util.JacksonUtils;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.*;
+import info.jiatu.jtlsp.common.util.ResultGeneratorUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
@@ -20,29 +22,27 @@ import org.springframework.web.context.request.RequestContextHolder;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
- * title LogAspect
- * Description 切面处理类，操作日志异常日志记录处理
- * CreateDate 2022/10/13 22:06
- *
- * @author izhouy
+ * @author izhou
+ * @path com.izhouy.template.common.handler
+ * @methodName ControllerLogHandler
+ * @description 接口层日志处理器
+ * @dateTime 2022/11/7 17:19
+ * @editNote
  */
-@Aspect
 @Component
-public class LogAspect {
+public class ControllerLogHandler extends BaseMethodAdviceHandler<Result> {
 
     /**
      * 操作版本号
      * 项目启动时从命令行传入，例如：java -jar xxx.war --version=201902
      */
     private String version = "1.0.0";
-
-    /**
-     * 统计请求的处理时间
-     */
-    ThreadLocal<Long> startTime = new ThreadLocal<>();
 
     @Resource
     private LogInfoService logInfoService;
@@ -51,48 +51,10 @@ public class LogAspect {
     private LogErrorInfoService logErrorInfoService;
 
     /**
-     * @methodName：logPoinCut
-     * @description：设置操作日志切入点 记录操作日志 在注解的位置切入代码
-     * @author：izhouy
-     * @dateTime：2021/11/18 14:22
-     * @Params： []
-     * @Return： void
-     * @editNote：
+     * 记录方法出入参和调用时长
      */
-    @Pointcut("@annotation(com.izhouy.template.common.annotation.Log)")
-    public void logPoinCut() {
-    }
-
-    /**
-     * @methodName：exceptionLogPoinCut
-     * @description：设置操作异常切入点记录异常日志 扫描所有controller包下操作
-     * @author：izhouy
-     * @dateTime：2021/11/18 14:22
-     * @Params： []
-     * @Return： void
-     * @editNote：
-     */
-    @Pointcut("execution(* com.izhouy.template.controller..*.*(..))")
-    public void exceptionLogPoinCut() {
-    }
-
-    @Before("logPoinCut()")
-    public void doBefore() {
-        // 接收到请求，记录请求开始时间
-        startTime.set(System.currentTimeMillis());
-    }
-
-    /**
-     * @methodName：doAfterReturning
-     * @description：正常返回通知，拦截用户操作日志，连接点正常执行完成后执行， 如果连接点抛出异常，则不会执行
-     * @author：izhouy
-     * @dateTime：2021/11/18 14:21
-     * @Params： [joinPoint, keys]
-     * @Return： void
-     * @editNote：
-     */
-    @AfterReturning(value = "logPoinCut()", returning = "keys")
-    public void doAfterReturning(JoinPoint joinPoint, Object keys) {
+    @Override
+    public void onComplete(ProceedingJoinPoint joinPoint, long startTime, boolean permitted, boolean thrown, Object result) {
         // 获取RequestAttributes
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         // 从获取RequestAttributes中获取HttpServletRequest的信息
@@ -106,7 +68,7 @@ public class LogAspect {
             // 获取请求的类名
             String className = joinPoint.getTarget().getClass().getName();
             // 获取操作
-            Log log = method.getAnnotation(Log.class);
+            ControllerLogAnno log = method.getAnnotation(ControllerLogAnno.class);
             if (Objects.nonNull(log)) {
                 logInfo.setModule(log.modul());
                 logInfo.setType(log.type());
@@ -117,7 +79,7 @@ public class LogAspect {
             // 请求参数
             logInfo.setReqParam(JacksonUtils.toJsonString(converMap(request.getParameterMap())));
             // 返回结果
-            logInfo.setResParam(JacksonUtils.toJsonString(keys));
+            logInfo.setResParam(JacksonUtils.toJsonString(result));
             // 请求用户ID
             logInfo.setUserId(LogAnnotConstants.USER_ID);
             // 请求用户名称
@@ -131,25 +93,33 @@ public class LogAspect {
             // 操作版本
             logInfo.setVersion(version);
             // 耗时
-            logInfo.setTakeUpTime(System.currentTimeMillis() - startTime.get());
+            logInfo.setTakeUpTime(System.currentTimeMillis() - startTime);
             logInfoService.save(logInfo);
-            startTime.remove();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    @Override
+    protected String getMethodDesc(ProceedingJoinPoint point) {
+        Method targetMethod = getTargetMethod(point);
+        // 获得方法上的 InvokeRecordAnno
+        InvokeRecordAnno anno = targetMethod.getAnnotation(InvokeRecordAnno.class);
+        String description = anno.value();
+
+        // 如果没有指定方法说明，那么使用默认的方法说明
+        if (StringUtils.isBlank(description)) {
+            description = super.getMethodDesc(point);
+        }
+
+        return description;
+    }
+
     /**
-     * @methodName：doAfterThrowing
-     * @description：异常返回通知，用于拦截异常日志信息 连接点抛出异常后执行
-     * @author：izhouy
-     * @dateTime：2021/11/18 14:23
-     * @Params： [joinPoint, e]
-     * @Return： void
-     * @editNote：
+     * 抛出异常时的处理
      */
-    @AfterThrowing(pointcut = "exceptionLogPoinCut()", throwing = "e")
-    public void doAfterThrowing(JoinPoint joinPoint, Throwable e) {
+    @Override
+    public void onThrow(ProceedingJoinPoint joinPoint, Throwable e) {
         // 获取RequestAttributes
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         // 从获取RequestAttributes中获取HttpServletRequest的信息
@@ -197,20 +167,17 @@ public class LogAspect {
     }
 
     /**
-     * @methodName：converMap
-     * @description：转换request 请求参数
-     * @author：izhouy
-     * @dateTime：2021/11/18 14:12
-     * @Params： [paramMap]
-     * @Return： java.util.Map<java.lang.String, java.lang.String>
-     * @editNote：
+     * 抛出异常时的返回值
      */
-    public Map<String, String> converMap(Map<String, String[]> paramMap) {
-        Map<String, String> rtnMap = new HashMap<>(paramMap.size());
-        for (String key : paramMap.keySet()) {
-            rtnMap.put(key, paramMap.get(key)[0]);
+    @Override
+    public Result getOnThrow(ProceedingJoinPoint point, Throwable e) {
+        // 获得返回值类型
+        Class<?> returnType = getTargetMethod(point).getReturnType();
+        // 如果返回值类型是 Map 或者其子类
+        if (Result.class.isAssignableFrom(returnType)) {
+            return ResultGeneratorUtils.error("调用出错");
         }
-        return rtnMap;
+        return null;
     }
 
     /**
@@ -229,5 +196,22 @@ public class LogAspect {
         }
         String message = exceptionName + ":" + exceptionMessage + "<br/>" + strbuff.toString();
         return message;
+    }
+
+    /**
+     * @methodName：converMap
+     * @description：转换request 请求参数
+     * @author：izhouy
+     * @dateTime：2021/11/18 14:12
+     * @Params： [paramMap]
+     * @Return： java.util.Map<java.lang.String, java.lang.String>
+     * @editNote：
+     */
+    public Map<String, String> converMap(Map<String, String[]> paramMap) {
+        Map<String, String> rtnMap = new HashMap<>(paramMap.size());
+        for (String key : paramMap.keySet()) {
+            rtnMap.put(key, paramMap.get(key)[0]);
+        }
+        return rtnMap;
     }
 }
