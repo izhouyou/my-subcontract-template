@@ -6,6 +6,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,7 +76,7 @@ public class RedisUtils {
         if (key != null && key.length > 0) {
             return redisTemplate.delete(key[0]);
         } else {
-            Long delete = redisTemplate.delete(CollectionUtils.arrayToList(key));
+            Long delete = redisTemplate.delete((Collection<String>) CollectionUtils.arrayToList(key));
             return delete > 0;
         }
     }
@@ -212,7 +213,7 @@ public class RedisUtils {
         if (key != null && key.length > 0) {
             return stringRedisTemplate.delete(key[0]);
         } else {
-            Long delete = stringRedisTemplate.delete(CollectionUtils.arrayToList(key));
+            Long delete = stringRedisTemplate.delete((Collection<String>) CollectionUtils.arrayToList(key));
             return delete > 0;
         }
     }
