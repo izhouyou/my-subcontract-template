@@ -1,6 +1,6 @@
 package com.izhouy.template.controller;
 
-import com.izhouy.template.common.anno.Log;
+import com.izhouy.template.common.anno.ControllerLogAnno;
 import com.izhouy.template.common.constant.LogAnnotConstants;
 import info.jiatu.jtlsp.common.annotation.AddGroups;
 import info.jiatu.jtlsp.common.annotation.UpdGroups;
@@ -73,7 +73,7 @@ public class LogInfoController {
      */
     @PostMapping
     @ApiOperation("操作日志新增接口")
-    @Log(modul = "LOGINFO", type = LogAnnotConstants.INSERT, desc = "操作日志新增接口")
+    @ControllerLogAnno(modul = "LOGINFO", type = LogAnnotConstants.INSERT, desc = "操作日志新增接口")
     public Result<Boolean> insert(@RequestBody @Validated(AddGroups.class) LogInfo logInfo) {
         return ResultGeneratorUtils.success(this.logInfoService.save(logInfo));
     }
@@ -86,7 +86,7 @@ public class LogInfoController {
      */
     @PutMapping
     @ApiOperation("操作日志更新接口")
-    @Log(modul = "LOGINFO", type = LogAnnotConstants.UPDATE, desc = "操作日志更新接口")
+    @ControllerLogAnno(modul = "LOGINFO", type = LogAnnotConstants.UPDATE, desc = "操作日志更新接口")
     public Result<Boolean> update(@Validated(UpdGroups.class) @RequestBody LogInfo logInfo) {
         return ResultGeneratorUtils.success(this.logInfoService.updateById(logInfo));
     }
@@ -100,7 +100,7 @@ public class LogInfoController {
     @DeleteMapping
     @ApiOperation("操作日志批量删除接口")
     @ApiImplicitParam(name = "idList", value = "主键id集合", defaultValue = "1,2", required = true, dataTypeClass = List.class)
-    @Log(modul = "LOGINFO", type = LogAnnotConstants.DELETE, desc = "操作日志删除接口")
+    @ControllerLogAnno(modul = "LOGINFO", type = LogAnnotConstants.DELETE, desc = "操作日志删除接口")
     public Result<Boolean> delete(@RequestParam("idList") List<Long> idList) {
         return ResultGeneratorUtils.success(this.logInfoService.removeByIds(idList));
     }

@@ -1,6 +1,6 @@
 package com.izhouy.template.controller;
 
-import com.izhouy.template.common.anno.Log;
+import com.izhouy.template.common.anno.ControllerLogAnno;
 import com.izhouy.template.common.constant.LogAnnotConstants;
 import info.jiatu.jtlsp.common.annotation.AddGroups;
 import info.jiatu.jtlsp.common.annotation.UpdGroups;
@@ -73,7 +73,7 @@ public class LogErrorInfoController {
      */
     @PostMapping
     @ApiOperation("操作日志异常信息新增接口")
-    @Log(modul = "LogErrorInfo", type = LogAnnotConstants.INSERT, desc = "操作日志异常信息新增接口")
+    @ControllerLogAnno(modul = "LogErrorInfo", type = LogAnnotConstants.INSERT, desc = "操作日志异常信息新增接口")
     public Result<Boolean> insert(@Validated(AddGroups.class) @RequestBody LogErrorInfo logErrorInfo) {
         return ResultGeneratorUtils.success(this.logErrorInfoService.save(logErrorInfo));
     }
@@ -86,7 +86,7 @@ public class LogErrorInfoController {
      */
     @PutMapping
     @ApiOperation("操作日志异常信息更新接口")
-    @Log(modul = "LogErrorInfo", type = LogAnnotConstants.UPDATE, desc = "操作日志异常信息更新接口")
+    @ControllerLogAnno(modul = "LogErrorInfo", type = LogAnnotConstants.UPDATE, desc = "操作日志异常信息更新接口")
     public Result<Boolean> update(@Validated(UpdGroups.class) @RequestBody LogErrorInfo logErrorInfo) {
         return ResultGeneratorUtils.success(this.logErrorInfoService.updateById(logErrorInfo));
     }
@@ -100,7 +100,7 @@ public class LogErrorInfoController {
     @DeleteMapping
     @ApiOperation("操作日志异常信息批量删除接口")
     @ApiImplicitParam(name = "idList", value = "主键id集合", defaultValue = "1,2", required = true, dataTypeClass = List.class)
-    @Log(modul = "LogErrorInfo", type = LogAnnotConstants.DELETE, desc = "操作日志异常信息删除接口")
+    @ControllerLogAnno(modul = "LogErrorInfo", type = LogAnnotConstants.DELETE, desc = "操作日志异常信息删除接口")
     public Result<Boolean> delete(@RequestParam("idList") List<Long> idList) {
         return ResultGeneratorUtils.success(this.logErrorInfoService.removeByIds(idList));
     }
