@@ -2,7 +2,6 @@ package com.izhouy.template.common.handler;
 
 import com.izhouy.template.common.anno.ControllerLogAnno;
 import com.izhouy.template.common.anno.InvokeRecordAnno;
-import com.izhouy.template.common.anno.Log;
 import com.izhouy.template.common.constant.LogAnnotConstants;
 import com.izhouy.template.domain.LogErrorInfo;
 import com.izhouy.template.domain.LogInfo;
